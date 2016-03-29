@@ -14,15 +14,8 @@
     ],
     "parserOptions": {
       "ecmaFeatures": {
-        "templateStrings": true,
         "jsx": true
       }
-    },
-    "rules": {
-      "indent": [
-        "error",
-        2
-      ]
     }
   },
   "repository": {
@@ -35,7 +28,7 @@
     "sass",
     "bootstrap"
   ],
-  "author": "Kristi Russell",
+  "author": "enkia",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.7.2",
