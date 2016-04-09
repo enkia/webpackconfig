@@ -1,9 +1,9 @@
 # Webpack Config File Example
-This is an example of a `webpack.config.js` file
+This is a simple example of a `webpack.config.js` file
 
-### The usual initial plugins/loader plus:
-- Minify CSS for production only
-- Uses postcss mqpacker plugin
-- Uses ExtractTextPlugin to create separate css file
+#### The usual initial plugins/loader plus:
+- Minify/Extract CSS for production only
+- Minify/Uglify JS for production only
+- Generate source maps for development only
 - Process Bootstrap font files
 
