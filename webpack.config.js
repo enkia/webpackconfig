@@ -1,23 +1,51 @@
 var path = require('path');
+var webpack = require('webpack');
+var argv = require('yargs').argv;
 var mqpacker = require('css-mqpacker');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
+var HtmlWebpackPlugincfg = new HtmlWebpackPlugin({
   template: __dirname + '/app/index.html',
   filename: 'index.html',
   inject: 'body'
 });
+UglifyJSPlugincfg = new webpack.optimize.UglifyJsPlugin({
+  //sourceMap: false,
+  compress: {
+    sequences: true,
+    dead_code: true,
+    conditionals: true,
+    booleans: true,
+    unused: true,
+    if_return: true,
+    join_vars: true,
+    drop_console: true
+  },
+  mangle: {
+    except: ['$super', '$', 'exports', 'require']
+  },
+  output: {
+    comments: false
+  }
+});
 
-// Minify CSS for production only
-var cssLoader;
-if(process.env.NODE_ENV === 'production') {
-  cssLoader = 'css?minimize!postcss!resolve-url!sass'
+
+var cfg = {
+  cssLoader: {
+    test: /\.scss$/, include: __dirname + '/app/scss',
+    loader: 'style!css?-minimize!resolve-url!sass?sourceMap'
+  },
+  devtoolSourceMap: 'source-map'
 }
-else {
-  cssLoader = 'css?-minimize!resolve-url!sass?sourceMap'
+
+// Minification settings for production
+if(argv.production) {
+  cfg.cssLoader.loader = ExtractTextPlugin.extract('style', 'css?minimize!postcss!resolve-url!sass?sourceMap');
+  cfg.devtoolSourceMap = '';
 }
 
 module.exports = {
+  devtool: cfg.devtoolSourceMap,
   entry: [
     './app/index.js'
   ],
@@ -30,26 +58,30 @@ module.exports = {
     loaders: [
       {
         test: /\.js$/, exclude: /node_modules/,
-        loader: 'babel-loader'
+        loader: 'babel-loader',
+        query: {
+          presets: 'react'
+        }
       },
-      {
-        // Use ExtractTextPlugin to create separate css file
-        test: /\.scss$/, include: __dirname + '/app/scss',
-        loader: ExtractTextPlugin.extract(
-          'style', cssLoader
-        )
-      },
+      cfg.cssLoader,
       {
         // Bootstrap includes font files which webpack needs to know how to handle
-        test: /\.(otf|eot|svg|ttf|woff|woff2)$/,
+        test: /\.(otf|eot|ttf|woff|woff2)$/,
         loader: 'url-loader?limit=9000&name=./css/fonts/[hash].[ext]'
+      },
+      {
+        test: /\.(svg|jpe?g|png)$/,
+        loaders: [
+          'file?&name=./img/[name].[ext]',
+          'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'
+        ]
       }
     ]
   },
 
   // Point webpack to bootstrap source files
   sassLoader: {
-    includePaths: [path.resolve(__dirname, './node_modules/bootstrap-sass/assets/stylesheets')]
+    includePaths: [path.resolve(__dirname, './node_modules/bootstrap/scss/')]
   },
 
   // Default css-loader minification missing mqpacker so load it
@@ -59,10 +91,14 @@ module.exports = {
     ];
   },
 
-  plugins: [
-    HtmlWebpackPluginConfig,
-    new ExtractTextPlugin('./css/site.css', {
-      //allChunks: true
+  plugins: argv.production ? [
+    HtmlWebpackPlugincfg,
+    UglifyJSPlugincfg,
+    new ExtractTextPlugin('./css/site.css'),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': JSON.stringify('production')
+      }
     })
-  ]
+  ] : [HtmlWebpackPlugincfg]
 };
