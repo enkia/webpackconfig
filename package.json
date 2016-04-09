@@ -16,6 +16,12 @@
       "ecmaFeatures": {
         "jsx": true
       }
+    },
+    "rules": {
+      "indent": [
+        "error",
+        2
+      ]
     }
   },
   "repository": {

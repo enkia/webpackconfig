@@ -9,7 +9,7 @@ var HtmlWebpackPlugincfg = new HtmlWebpackPlugin({
   filename: 'index.html',
   inject: 'body'
 });
-UglifyJSPlugincfg = new webpack.optimize.UglifyJsPlugin({
+var UglifyJSPlugincfg = new webpack.optimize.UglifyJsPlugin({
   //sourceMap: false,
   compress: {
     sequences: true,
