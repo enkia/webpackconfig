@@ -1,4 +1,4 @@
-# Webpack Config File Example
+# Webpack Config File Example (DEPRECATED)
 This is a simple example of a `webpack.config.js` file
 
 #### The usual initial plugins/loader plus:
